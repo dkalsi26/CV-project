@@ -1,0 +1,68 @@
+
+# Python environments, caches, and tooling
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+coverage.xml
+htmlcov/
+
+# Jupyter and editor state
+.ipynb_checkpoints/
+.vscode/
+.idea/
+*.code-workspace
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Model artifacts, experiment output, and downloaded packages
+*.ckpt
+*.pth
+*.pt
+*.onnx
+*.h5
+*.whl
+checkpoints/
+results/
+.downloads/
+
+# Logs and runtime files
+*.log
+*.pid
+*.tmp
+*.bak
+
+# Datasets and generated media (keep only scripts/configuration)
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tif
+*.tiff
+*.avi
+*.mp4
+*.mov
+/brackish/*
+!/brackish/scripts/
+!/brackish/scripts/**
+/brackish_paired_sequence/
+/brackish_sequence_split/
+/classical_enhanced/
+/trash_icra_paired/
+/trash_ICRA19/*
+!/trash_ICRA19/config.yaml
