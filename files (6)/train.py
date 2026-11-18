@@ -183,7 +183,21 @@ def train(args):
         print(f"Resumed from {args.resume}: {start_epoch} epochs completed; "
               f"continuing at epoch {start_epoch + 1}/{args.epochs}")
 
-    for epoch in range(start_epoch, args.epochs):
+    stop_after_epoch = getattr(args, "stop_after_epoch", None)
+    if stop_after_epoch is not None:
+        if not 1 <= stop_after_epoch <= args.epochs:
+            raise ValueError(
+                f"stop_after_epoch must be in [1, {args.epochs}], got {stop_after_epoch}"
+            )
+        stop_epoch = stop_after_epoch
+    else:
+        stop_epoch = args.epochs
+
+    if start_epoch >= stop_epoch:
+        print(f"Nothing to train: {start_epoch} epochs already completed (segment ends at {stop_epoch}).")
+        return
+
+    for epoch in range(start_epoch, stop_epoch):
         model.train()
         epoch_start = time.time()
         running_loss = 0.0
@@ -243,14 +257,14 @@ def train(args):
                 )
                 print(f"Saved best checkpoint: {best_path}")
 
-        if (epoch + 1) % args.save_interval == 0 or (epoch + 1) == args.epochs:
+        if (epoch + 1) % args.save_interval == 0 or (epoch + 1) == stop_epoch:
             ckpt_path = os.path.join(args.save_dir, f"uice_mirnet_epoch{epoch+1}.pth")
             save_checkpoint(
                 ckpt_path, epoch, model, optimizer, scheduler, scaler, args, best_val_loss
             )
             print(f"Saved checkpoint: {ckpt_path}")
 
-    print("Training complete.")
+    print(f"Training segment complete: {stop_epoch}/{args.epochs} epochs.")
 
 
 def get_args():
@@ -280,6 +294,12 @@ def get_args():
     parser.add_argument("--save_interval", type=int, default=5)
     parser.add_argument("--log_interval", type=int, default=20)
     parser.add_argument("--resume", type=str, default=None, help="Path to checkpoint to resume from")
+    parser.add_argument(
+        "--stop_after_epoch",
+        type=int,
+        default=None,
+        help="Stop after this absolute epoch and save a resumable checkpoint (default: train through --epochs)",
+    )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--amp", action="store_true", help="Use CUDA mixed-precision training")
     parser.add_argument(
